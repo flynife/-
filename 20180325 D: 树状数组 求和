@@ -1,0 +1,81 @@
+#include<iostream>
+#include<cstdio>
+using namespace std;
+struct node
+{
+	int l,r,mid,sum;
+}s[1100000];
+int a[400001];
+void build(int id,int l,int r)
+{
+	s[id].l=l;
+	s[id].r=r;
+	s[id].mid=(l+r)/2;
+	if(l==r)s[id].sum=a[l];
+	else
+	{
+		build(id*2,l,s[id].mid);
+		build(id*2+1,s[id].mid+1,r);
+		s[id].sum=s[id*2+1].sum+s[id*2].sum;
+	}
+}
+int ins(int id,int x)
+{
+	if(s[id].l==s[id].r) s[id].sum=a[x];
+	else if(x>s[id].mid)
+	{
+		ins(id*2+1,x);
+		s[id].sum=s[id*2].sum+s[id*2+1].sum;
+	}
+	else
+	{
+		ins(id*2,x);
+		s[id].sum=s[id*2].sum+s[id*2+1].sum;
+	}
+}
+int cal(int id,int l,int r)
+{
+	if(l<=s[id].l&&r>=s[id].r)
+	{
+		return s[id].sum;
+	}
+	else if(r<=s[id].mid)
+	{
+		return cal(2*id,l,r);
+	}
+	else if(l>s[id].mid)
+	{
+		return cal(id*2+1,l,r);
+	}
+	else
+	{
+		return cal(id*2,l,r)+cal(id*2+1,l,r);
+	}
+	
+}
+int main()
+{
+	int n,i,j,m;
+	cin>>n;
+	for(i=1;i<=n;i++)cin>>a[i];
+	build(1,1,n);
+	cin>>m;
+	for(i=1;i<=m;i++)
+	{
+		char gg[10];
+		scanf("%s",gg);
+		if(gg[0]=='Q')
+		{
+			int x,y;
+			scanf("%d%d",&x,&y);
+			printf("%d\n",cal(1,x,y));;
+		}
+		else if(gg[0]=='C')
+		{
+			int x,y;
+			scanf("%d%d",&x,&y);
+			a[x]=y;
+			ins(1,x);
+		}
+	}
+}
